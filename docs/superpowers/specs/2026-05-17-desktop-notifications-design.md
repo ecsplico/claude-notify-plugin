@@ -37,6 +37,7 @@ Four scripts, wired through `hooks/hooks.json`:
 | `notify-attention.sh` | `Notification` | async | Speak (optional) + dispatch desktop notification for needs-attention |
 | `desktop-notify.sh` | — (helper) | — | Detached helper: shows the notification, handles the click |
 
+All four scripts live in the plugin's existing `scripts/` directory.
 `desktop-notify.sh` is not a hook. It is launched **fully detached** (`setsid`,
 stdio redirected to `/dev/null`) by `speak-recap.sh` and `notify-attention.sh`.
 
@@ -132,10 +133,13 @@ detect the `※ recap:` marker. The message text comes from the transcript file,
 
 ### `notify-attention.sh` (modified — Notification hook)
 
-Same restructuring as `speak-recap.sh`: existing `session_id` / transcript /
-`#NNNN` logic preserved, early `say`-missing `exit 0` removed, audio gated on
-`CLAUDE_NOTIFY_AUDIO`. Launches `desktop-notify.sh` detached with title
-`Claude #NNNN` and body `needs attention`.
+Same restructuring as `speak-recap.sh`. Note `notify-attention.sh` only reads
+the transcript to extract the `#NNNN` number from the latest `custom-title`
+line — it has no recap text and does **not** use the `tac | jq` message
+pipeline. Existing `session_id` / `#NNNN` logic preserved, early `say`-missing
+`exit 0` removed, audio gated on `CLAUDE_NOTIFY_AUDIO`. Launches
+`desktop-notify.sh` detached with title `Claude #NNNN` and body
+`needs attention`.
 
 ### `desktop-notify.sh` (new — detached helper, not a hook)
 
