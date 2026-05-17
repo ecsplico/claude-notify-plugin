@@ -1,0 +1,8 @@
+{
+  "name": "claude-notification-plugin",
+  "description": "Session numbering and audio notifications (ready, recap, needs-attention) via say",
+  "version": "1.0.0",
+  "author": {
+    "name": "matthias"
+  }
+}

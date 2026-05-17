@@ -1,0 +1,15 @@
+{
+  "name": "claude-notification-plugin",
+  "description": "Local plugin marketplace for audio notifications",
+  "owner": {
+    "name": "matthias"
+  },
+  "plugins": [
+    {
+      "name": "claude-notification-plugin",
+      "description": "Session numbering and audio notifications via say",
+      "version": "1.0.0",
+      "source": "./"
+    }
+  ]
+}
