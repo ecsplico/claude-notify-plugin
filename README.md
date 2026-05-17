@@ -14,6 +14,8 @@ that hosts the originating session.
 | Claude finishes a turn (recap present) | "Claude 0001 re-caps: \<text\>" | "Claude #0001 — re-caps: \<text\>" |
 | Claude needs attention (tool permission, etc.) | "Claude 0001 needs attention" | "Claude #0001 — needs attention" |
 
+> **Note:** The desktop notification text shown above is a combined representation. In practice, `notify-send` receives the title (e.g. `Claude #0001`) and body (e.g. `ready!`) as separate arguments. The exact rendered layout — whether title and body appear on separate lines, inline, or with different styling — depends on your notification daemon.
+
 Session titles in the sidebar are also updated to the format `#0001 <AI title>`.
 
 Each desktop notification has a **Focus window** action. Clicking it brings the
@@ -35,6 +37,7 @@ generic "ready!" message. The same text is used as the desktop notification body
 - **`jq`** — used in all scripts to parse the JSONL transcript
 - **`say`** — TTS command expected on `$PATH`
 - **`notify-send`** (libnotify) — for desktop notifications
+- **`wlrctl`** — for notification click-to-focus; requires a wlroots-based Wayland compositor (e.g. labwc, Sway, Hyprland)
 
 If `say` is not found the audio scripts exit silently (a warning is written to
 stderr). The session-numbering script (`number-session.sh`) runs regardless

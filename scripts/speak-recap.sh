@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-session_id=$(jq -r '.session_id')
+session_id=$(jq -r '.session_id // empty')
 # Wait for the current turn to be committed to the transcript before reading.
 sleep 1
 transcript=$(find ~/.claude/projects -name "${session_id}.jsonl" 2>/dev/null | head -1)
