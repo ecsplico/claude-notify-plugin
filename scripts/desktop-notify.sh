@@ -29,7 +29,16 @@ map_file="$HOME/.claude/notification-windows/$session_id"
 [ -s "$map_file" ] || exit 0
 command -v wlrctl >/dev/null 2>&1 || exit 0
 
-match=$(head -n1 "$map_file")
-[ -n "$match" ] || exit 0
-wlrctl toplevel focus app_id:code "title:$match" 2>/dev/null || true
+stored=$(head -n1 "$map_file")
+[ -n "$stored" ] || exit 0
+
+# VS Code prepends the active filename to the title, so the stored workspace
+# key ("ws - Visual Studio Code") may not be the current verbatim title.
+# Resolve the live full title by substring-matching against all code toplevels.
+current_title=$(wlrctl toplevel list 2>/dev/null \
+    | sed -n 's/^code: //p' \
+    | grep -F "$stored" \
+    | head -n1)
+[ -n "$current_title" ] || exit 0
+wlrctl toplevel focus app_id:code "title:$current_title" 2>/dev/null || true
 exit 0
