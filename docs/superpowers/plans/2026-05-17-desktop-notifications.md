@@ -666,7 +666,7 @@ exit 0
 - [ ] **Step 4: Run the test to verify it passes**
 
 Run: `bash tests/test_speak_recap.sh`
-Expected: PASS — `--- 11 run, 0 failed ---`.
+Expected: PASS — `--- 10 run, 0 failed ---`.
 
 - [ ] **Step 5: Commit**
 
@@ -786,7 +786,7 @@ exit 0
 - [ ] **Step 4: Run the test to verify it passes**
 
 Run: `bash tests/test_notify_attention.sh`
-Expected: PASS — `--- 8 run, 0 failed ---`.
+Expected: PASS — `--- 7 run, 0 failed ---`.
 
 - [ ] **Step 5: Commit**
 
