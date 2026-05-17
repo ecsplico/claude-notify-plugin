@@ -3,10 +3,10 @@
 
 TESTS_RUN=0
 TESTS_FAILED=0
-CURRENT_TEST=""
 
 # setup_sandbox — fresh temp HOME + stub bin dir on PATH. Call before each test.
 setup_sandbox() {
+    _SAVED_PATH="$PATH"
     SANDBOX=$(mktemp -d)
     STUBS="$SANDBOX/bin"
     STUB_LOG="$SANDBOX/log"
@@ -15,9 +15,11 @@ setup_sandbox() {
     export PATH="$STUBS:$PATH"
 }
 
-# teardown_sandbox — remove the temp tree.
+# teardown_sandbox — remove the temp tree and restore PATH.
 teardown_sandbox() {
     [ -n "${SANDBOX:-}" ] && rm -rf "$SANDBOX"
+    [ -n "${_SAVED_PATH:-}" ] && export PATH="$_SAVED_PATH"
+    return 0
 }
 
 # stub <name> — install an executable stub on PATH. Stub body is read from
@@ -25,6 +27,7 @@ teardown_sandbox() {
 # before the body runs.
 stub() {
     local name="$1"
+    : > "$STUB_LOG/$name.calls"
     {
         echo '#!/usr/bin/env bash'
         echo "printf '%s\\n' \"\$*\" >> \"$STUB_LOG/$name.calls\""
@@ -38,6 +41,7 @@ calls_of() {
     cat "$STUB_LOG/$1.calls" 2>/dev/null || true
 }
 
+# assert_eq <expected> <actual> <message>
 assert_eq() {
     TESTS_RUN=$((TESTS_RUN + 1))
     if [ "$1" = "$2" ]; then
