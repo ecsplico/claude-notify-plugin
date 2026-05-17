@@ -85,4 +85,25 @@ echo '{"session_id":"s4"}' | PATH="$STUBS:/usr/bin:/bin" bash "$SCRIPT"
 assert_contains "$(calls_of setsid)" "desktop-notify.sh" "missing say does not abort the script"
 teardown_sandbox
 
+# --- tool-only final turn (no assistant text): still notifies with "ready!"
+setup_sandbox
+mkdir -p "$HOME/.claude/projects/proj"
+{
+    printf '%s\n' '{"type":"custom-title","customTitle":"#0001 Some title"}'
+    printf '%s\n' '{"type":"assistant","message":{"content":[{"type":"tool_use","name":"Bash"}]}}'
+} > "$HOME/.claude/projects/proj/s5.jsonl"
+stub sleep  <<'EOF'
+exit 0
+EOF
+stub say    <<'EOF'
+exit 0
+EOF
+stub setsid <<'EOF'
+exit 0
+EOF
+echo '{"session_id":"s5"}' | bash "$SCRIPT"
+assert_contains "$(calls_of setsid)" "ready!"             "tool-only turn still dispatches ready notification"
+assert_contains "$(calls_of say)"    "Claude 0001 ready!" "tool-only turn still speaks ready"
+teardown_sandbox
+
 finish

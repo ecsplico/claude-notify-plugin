@@ -5,7 +5,8 @@ sleep 1
 transcript=$(find ~/.claude/projects -name "${session_id}.jsonl" 2>/dev/null | head -1)
 [ -f "$transcript" ] || exit 0
 
-# Get last assistant message that has text content (skip tool-only turns).
+# Get the last assistant message's text content, if any. A tool-only final
+# turn has none — that is fine; we still notify with the generic "ready!".
 text=$(tac "$transcript" | jq -rn '
   first(
     inputs
@@ -15,7 +16,7 @@ text=$(tac "$transcript" | jq -rn '
     | select(length > 0)
   )
 ' 2>/dev/null)
-if [ -z "$text" ] || [ "$text" = "null" ]; then exit 0; fi
+[ "$text" = "null" ] && text=""
 
 # Extract only the 4-digit number from custom-title (e.g. "#0001 Some title" -> "0001").
 session_num=$(grep '"type":"custom-title"' "$transcript" | tail -1 | jq -r '.customTitle' 2>/dev/null | grep -oP '(?<=^#)\d{4}')
