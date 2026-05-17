@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-command -v say &>/dev/null || { echo "claude-notification-plugin: 'say' not found — install a TTS backend (e.g. spd-say, mimic3, piper) and symlink it to say" >&2; exit 0; }
 session_id=$(jq -r '.session_id // empty')
 
 session_num=""
@@ -10,8 +9,20 @@ if [ -n "$session_id" ]; then
     fi
 fi
 
-if [ -n "$session_num" ]; then
-    say "Claude ${session_num} needs attention"
-else
-    say "Claude needs attention"
+prefix="Claude"
+[ -n "$session_num" ] && prefix="Claude ${session_num}"
+
+# Audio (optional) — no longer aborts the script when 'say' is unavailable.
+if [ "${CLAUDE_NOTIFY_AUDIO:-1}" != "0" ] && command -v say >/dev/null 2>&1; then
+    say "${prefix} needs attention"
 fi
+
+# Desktop notification — `setsid -f` forks the helper into a new session and
+# returns immediately, so the helper survives turn end (it blocks waiting for a
+# notification click) while this hook exits without waiting.
+notify_title="Claude"
+[ -n "$session_num" ] && notify_title="Claude #${session_num}"
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+setsid -f "${script_dir}/desktop-notify.sh" "$notify_title" "needs attention" "$session_id" \
+    </dev/null >/dev/null 2>&1
+exit 0
